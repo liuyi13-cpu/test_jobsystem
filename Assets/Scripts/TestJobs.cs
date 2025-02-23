@@ -15,6 +15,9 @@ public class TestJobs : MonoBehaviour
         // Editor下 10倍
         // Jobs + BurstCompile
         NoJobs(); // 262 ms
+        NoJobsTempJob();
+        NoJobsPersistent();
+        
         Jobs();   // 25  ms
     }
 
@@ -31,6 +34,38 @@ public class TestJobs : MonoBehaviour
         
         sw.Stop();
         Debug.LogWarning($"NoJobs: {sw.ElapsedMilliseconds}");
+    }   
+    
+    private void NoJobsPersistent()
+    {
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
+        
+        NativeArray<float> result = new NativeArray<float>(10000000, Allocator.Persistent);
+        for (int i = 0; i < result.Length; i++)
+        {
+            result[i] = i * Mathf.PI;
+        }
+
+        result.Dispose();
+        sw.Stop();
+        Debug.LogWarning($"NoJobsPersistent: {sw.ElapsedMilliseconds}");
+    }   
+    
+    private void NoJobsTempJob()
+    {
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
+        
+        NativeArray<float> result = new NativeArray<float>(10000000, Allocator.TempJob);
+        for (int i = 0; i < result.Length; i++)
+        {
+            result[i] = i * Mathf.PI;
+        }
+
+        result.Dispose();
+        sw.Stop();
+        Debug.LogWarning($"NoJobsTempJob: {sw.ElapsedMilliseconds}");
     }
 
     private void Jobs()
